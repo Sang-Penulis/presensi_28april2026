@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">    
+<head>
+<meta charset="UTF-8"> <!-- Set encoding karakter -->
+<title>Form Mahasiswa</title> <!-- Judul halaman -->
+
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif; /* Font utama */
+        margin: 0; /* Hilangkan margin default */
+        min-height: 100vh; /* Tinggi minimal full layar */
+        background: linear-gradient(135deg, #00c6ff, #0072ff); /* Background gradasi */
+        display: flex; /* Flexbox layout */
+        flex-direction: column; /* Susun vertikal */
+        align-items: center; /* Tengah horizontal */
+    }
+
+    h2 {
+        text-align: center; /* Teks di tengah */
+        color: white; /* Warna teks putih */
+        margin-top: 20px; /* Jarak atas */
+    }
+
+    form {
+        width: 600px; /* Lebar form */
+        background: linear-gradient(135deg, #ff00cc, #4a00e0); /* Background gradasi */
+        padding: 20px; /* Jarak dalam */
+        border-radius: 15px; /* Sudut melengkung */
+        margin-top: 10px; /* Jarak atas */
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3); /* Bayangan */
+        color: white; /* Warna teks */
+
+        display: grid; /* Layout grid */
+        grid-template-columns: 1fr 1fr; /* 2 kolom */
+        gap: 10px; /* Jarak antar elemen */
+    }
+
+    label {
+        font-size: 14px; /* Ukuran teks label */
+    }
+
+    input, textarea, select {
+        width: 100%; /* Lebar penuh */
+        padding: 8px; /* Jarak dalam */
+        border: none; /* Tanpa border */
+        border-radius: 8px; /* Sudut melengkung */
+        outline: none; /* Hilangkan outline saat klik */
+    }
+
+    textarea {
+        grid-column: span 2; /* Ambil 2 kolom */
+        resize: none; /* Tidak bisa di-resize */
+    }
+
+    .jk-container {
+        grid-column: span 2; /* Ambil 2 kolom */
+        display: flex; /* Flexbox */
+        gap: 20px; /* Jarak antar item */
+        align-items: center; /* Tengah vertikal */
+    }
+
+    button {
+        padding: 10px; /* Jarak dalam */
+        border: none; /* Tanpa border */
+        border-radius: 8px; /* Sudut melengkung */
+        cursor: pointer; /* Cursor pointer */
+        font-weight: bold; /* Tebal */
+    }
+
+    .submit {
+        background: #00ffcc; /* Warna tombol submit */
+        color: black; /* Warna teks */
+    }
+
+    .reset {
+        background: #222; /* Warna tombol reset */
+        color: white; /* Warna teks */
+    }
+
+    form button {
+        grid-column: span 1; /* 1 kolom */
+        width: 100%; /* Lebar penuh */
+    }
+
+    table {
+        width: 90%; /* Lebar tabel */
+        margin-top: 20px; /* Jarak atas */
+        border-collapse: collapse; /* Gabung border */
+        background: rgba(255,255,255,0.15); /* Background transparan */
+        backdrop-filter: blur(10px); /* Efek blur */
+        border-radius: 10px; /* Sudut melengkung */
+        overflow: hidden; /* Sembunyikan overflow */
+        color: white; /* Warna teks */
+    }
+
+    th, td {
+        padding: 10px; /* Jarak dalam */
+        text-align: center; /* Teks rata tengah */
+        border-bottom: 1px solid rgba(255,255,255,0.2); /* Garis bawah */
+    }
+
+    th {
+        background: rgba(0,0,0,0.3); /* Background header tabel */
+    }
+</style>
+
+</head>
+
+<body>
+
+<h2>Form Data Mahasiswa</h2> <!-- Judul form -->
+
+<form id="formMahasiswa"> <!-- Form input -->
+    <label>NIM</label> <!-- Label NIM -->
+    <input type="text" id="nim" required> <!-- Input NIM -->
+
+    <label>Nama</label> <!-- Label Nama -->
+    <input type="text" id="nama" required> <!-- Input Nama -->
+
+    <label>Alamat</label> <!-- Label Alamat -->
+    <textarea id="alamat"></textarea> <!-- Input Alamat -->
+
+    <label>Jenis Kelamin</label> <!-- Label JK -->
+    <div class="jk-container">
+        <label><input type="radio" name="jk" value="Pria"> Pria</label> <!-- Radio pria -->
+        <label><input type="radio" name="jk" value="Wanita"> Wanita</label> <!-- Radio wanita -->
+    </div>
+
+    <label>Tanggal Lahir</label> <!-- Label TTL -->
+    <select id="tanggal"></select> <!-- Dropdown tanggal -->
+
+    <select id="bulan"> <!-- Dropdown bulan -->
+        <option value="01">Januari</option>
+        <option value="02">Februari</option>
+        <option value="03">Maret</option>
+        <option value="04">April</option>
+        <option value="05">Mei</option>
+        <option value="06">Juni</option>
+        <option value="07">Juli</option>
+        <option value="08">Agustus</option>
+        <option value="09">September</option>
+        <option value="10">Oktober</option>
+        <option value="11">November</option>
+        <option value="12">Desember</option>
+    </select>
+
+    <select id="tahun"></select> <!-- Dropdown tahun -->
+
+    <label>Password</label> <!-- Label password -->
+    <input type="password" id="password"> <!-- Input password -->
+
+    <button type="submit" class="submit">Submit</button> <!-- Tombol submit -->
+    <button type="reset" class="reset">Reset</button> <!-- Tombol reset -->
+</form>
+
+<h2>Data Mahasiswa</h2> <!-- Judul tabel -->
+
+<table>
+    <thead>
+        <tr>
+            <th>NIM</th> <!-- Kolom NIM -->
+            <th>Nama</th> <!-- Kolom Nama -->
+            <th>Alamat</th> <!-- Kolom Alamat -->
+            <th>JK</th> <!-- Kolom Jenis Kelamin -->
+            <th>TTL</th> <!-- Kolom Tanggal Lahir -->
+            <th>Password</th> <!-- Kolom Password -->
+            <th>Aksi</th> <!-- Kolom Aksi -->
+        </tr>
+    </thead>
+    <tbody id="tableBody"></tbody> <!-- Isi tabel dinamis -->
+</table>
+
+</body>
+</html>
