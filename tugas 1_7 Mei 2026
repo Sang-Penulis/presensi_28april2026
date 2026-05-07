@@ -1,0 +1,519 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# =====================================
+# MEMBACA FILE EXCEL
+# =====================================
+
+df = pd.read_excel('restoran.xls')
+
+
+# =====================================
+# CLASS RESTORAN
+# =====================================
+
+class restoran:
+
+    def __init__(self):
+
+        # Data Awal
+        self.id_restoran = 0
+        self.pelayanan = 0
+        self.makanan = 0
+
+        # FUZZIFIKASI INPUT
+
+        # Makanan
+        self.makanan_enak = -1
+        self.makanan_tidakenak = -1
+
+        # Pelayanan
+        self.pelayanan_baik = -1
+        self.pelayanan_biasa = -1
+        self.pelayanan_jelek = -1
+
+        # INFERENSI OUTPUT
+        self.bagus = []
+        self.buruk = []
+
+        self.bagus_akhir = 0
+        self.buruk_akhir = 0
+
+        # DEFUZZIFIKASI
+        self.nilai_akhir = 0
+
+    def tampilData(self):
+
+        print(
+            'ID : {} \nPelayanan : {} \nMakanan : {} \nNilai Akhir : {}\n'.format(
+                self.id_restoran,
+                self.pelayanan,
+                self.makanan,
+                self.nilai_akhir
+            )
+        )
+
+
+# =====================================
+# MEMASUKKAN DATA KE LIST
+# =====================================
+
+restoran_data = []
+
+for i in range(len(df)):
+
+    restoran_temp = restoran()
+
+    restoran_temp.id_restoran = df.iloc[i][0]
+    restoran_temp.pelayanan = df.iloc[i][1]
+    restoran_temp.makanan = df.iloc[i][2]
+
+    restoran_data.append(restoran_temp)
+
+
+# =====================================
+# GRAFIK PELAYANAN
+# =====================================
+
+def GambarPelayanan():
+
+    x1 = [0, 20, 40, 100]
+    y1 = [1, 1, 0, 0]
+
+    x2 = [0, 20, 40, 60, 90, 100]
+    y2 = [0, 0, 1, 1, 0, 0]
+
+    x3 = [0, 60, 90, 100]
+    y3 = [0, 0, 1, 1]
+
+    plt.figure(figsize=(10, 5))
+
+    plt.plot(x1, y1, 'r-', label='Jelek')
+    plt.plot(x2, y2, 'g-', label='Biasa')
+    plt.plot(x3, y3, 'b-', label='Baik')
+
+    plt.xlabel('Nilai Pelayanan')
+    plt.ylabel('Nilai Keanggotaan')
+    plt.title('Fungsi Keanggotaan Pelayanan')
+
+    plt.legend()
+
+    plt.savefig('fungsi_keanggotaan_pelayanan.jpg', dpi=300)
+
+    plt.show()
+
+
+# =====================================
+# GRAFIK MAKANAN
+# =====================================
+
+def GambarMakanan():
+
+    x1 = [0, 4, 7, 10]
+    y1 = [1, 1, 0, 0]
+
+    x2 = [0, 4, 7, 10]
+    y2 = [0, 0, 1, 1]
+
+    plt.figure(figsize=(10, 5))
+
+    plt.plot(x1, y1, 'r-', label='Tidak Enak')
+    plt.plot(x2, y2, 'b-', label='Enak')
+
+    plt.xlabel('Nilai Makanan')
+    plt.ylabel('Nilai Keanggotaan')
+    plt.title('Fungsi Keanggotaan Makanan')
+
+    plt.legend()
+
+    plt.savefig('fungsi_keanggotaan_makanan.jpg', dpi=300)
+
+    plt.show()
+
+
+# =====================================
+# MENAMPILKAN GRAFIK
+# =====================================
+
+GambarPelayanan()
+GambarMakanan()
+
+
+# =====================================
+# FUZZIFIKASI
+# =====================================
+
+def fuzzifikasi(restoran_temp):
+
+    for i in range(len(restoran_temp)):
+
+        # =====================================
+        # FUZZY PELAYANAN
+        # =====================================
+
+        if 1 <= restoran_temp[i].pelayanan <= 20:
+
+            restoran_temp[i].pelayanan_jelek = 1
+
+        elif 20 < restoran_temp[i].pelayanan < 40:
+
+            restoran_temp[i].pelayanan_jelek = (
+                -(restoran_temp[i].pelayanan - 40) / (40 - 20)
+            )
+
+            restoran_temp[i].pelayanan_biasa = (
+                (restoran_temp[i].pelayanan - 20) / (40 - 20)
+            )
+
+        elif 40 <= restoran_temp[i].pelayanan <= 60:
+
+            restoran_temp[i].pelayanan_biasa = 1
+
+        elif 60 < restoran_temp[i].pelayanan < 90:
+
+            restoran_temp[i].pelayanan_biasa = (
+                -(restoran_temp[i].pelayanan - 90) / (90 - 60)
+            )
+
+            restoran_temp[i].pelayanan_baik = (
+                (restoran_temp[i].pelayanan - 60) / (90 - 60)
+            )
+
+        elif 90 <= restoran_temp[i].pelayanan <= 100:
+
+            restoran_temp[i].pelayanan_baik = 1
+
+        # =====================================
+        # FUZZY MAKANAN
+        # =====================================
+
+        if 1 <= restoran_temp[i].makanan <= 4:
+
+            restoran_temp[i].makanan_tidakenak = 1
+
+        elif 4 < restoran_temp[i].makanan < 7:
+
+            restoran_temp[i].makanan_tidakenak = (
+                -(restoran_temp[i].makanan - 7) / (7 - 4)
+            )
+
+            restoran_temp[i].makanan_enak = (
+                (restoran_temp[i].makanan - 4) / (7 - 4)
+            )
+
+        elif 7 <= restoran_temp[i].makanan <= 10:
+
+            restoran_temp[i].makanan_enak = 1
+
+    return restoran_temp
+
+
+# =====================================
+# MENJALANKAN FUZZIFIKASI
+# =====================================
+
+restoran_data = fuzzifikasi(restoran_data)
+
+
+# =====================================
+# INFERENSI
+# =====================================
+
+def inferensi(restoran_temp):
+
+    for i in range(len(restoran_temp)):
+
+        # =====================================
+        # MAKANAN TIDAK ENAK
+        # =====================================
+
+        if restoran_temp[i].makanan_tidakenak != -1:
+
+            if restoran_temp[i].pelayanan_jelek != -1:
+
+                restoran_temp[i].buruk.append(
+                    min(
+                        restoran_temp[i].makanan_tidakenak,
+                        restoran_temp[i].pelayanan_jelek
+                    )
+                )
+
+            if restoran_temp[i].pelayanan_biasa != -1:
+
+                restoran_temp[i].buruk.append(
+                    min(
+                        restoran_temp[i].makanan_tidakenak,
+                        restoran_temp[i].pelayanan_biasa
+                    )
+                )
+
+            if restoran_temp[i].pelayanan_baik != -1:
+
+                restoran_temp[i].buruk.append(
+                    min(
+                        restoran_temp[i].makanan_tidakenak,
+                        restoran_temp[i].pelayanan_baik
+                    )
+                )
+
+        # =====================================
+        # MAKANAN ENAK
+        # =====================================
+
+        if restoran_temp[i].makanan_enak != -1:
+
+            if restoran_temp[i].pelayanan_jelek != -1:
+
+                restoran_temp[i].buruk.append(
+                    min(
+                        restoran_temp[i].makanan_enak,
+                        restoran_temp[i].pelayanan_jelek
+                    )
+                )
+
+            if restoran_temp[i].pelayanan_biasa != -1:
+
+                restoran_temp[i].bagus.append(
+                    min(
+                        restoran_temp[i].makanan_enak,
+                        restoran_temp[i].pelayanan_biasa
+                    )
+                )
+
+            if restoran_temp[i].pelayanan_baik != -1:
+
+                restoran_temp[i].bagus.append(
+                    min(
+                        restoran_temp[i].makanan_enak,
+                        restoran_temp[i].pelayanan_baik
+                    )
+                )
+
+        # =====================================
+        # MENGAMBIL NILAI MAKSIMUM
+        # =====================================
+
+        if len(restoran_temp[i].bagus) != 0:
+
+            restoran_temp[i].bagus_akhir = max(
+                restoran_temp[i].bagus
+            )
+
+        if len(restoran_temp[i].buruk) != 0:
+
+            restoran_temp[i].buruk_akhir = max(
+                restoran_temp[i].buruk
+            )
+
+    return restoran_temp
+
+
+# =====================================
+# MENJALANKAN INFERENSI
+# =====================================
+
+restoran_data = inferensi(restoran_data)
+
+
+# =====================================
+# GRAFIK OUTPUT
+# =====================================
+
+def GambarNilaiAkhir():
+
+    x1 = [0, 40, 80, 100]
+    y1 = [1, 1, 0, 0]
+
+    x2 = [0, 40, 80, 100]
+    y2 = [0, 0, 1, 1]
+
+    plt.figure(figsize=(10, 5))
+
+    plt.plot(x1, y1, 'r-', label='Buruk')
+    plt.plot(x2, y2, 'b-', label='Bagus')
+
+    plt.xlabel('Nilai Restoran')
+    plt.ylabel('Nilai Keanggotaan')
+    plt.title('Fungsi Keanggotaan Output')
+
+    plt.legend()
+
+    plt.savefig('fungsi_keanggotaan_output.jpg', dpi=300)
+
+    plt.show()
+
+
+# =====================================
+# MENAMPILKAN GRAFIK OUTPUT
+# =====================================
+
+GambarNilaiAkhir()
+
+
+# =====================================
+# DEFUZZIFIKASI
+# =====================================
+
+def defuzzifikasi(sample: int, rest: restoran) -> restoran:
+
+    parm = {
+
+        "batas_bawah": 1,
+
+        "buruk_c": 40,
+        "buruk_d": 80,
+
+        "bagus_a": 40,
+        "bagus_b": 80,
+
+        "batas_atas": 100
+    }
+
+    pembilang = 0
+    penyebut = 0
+
+    increment = 100 // sample
+
+    for i in range(sample):
+
+        bilangan = (i + 1) * increment
+
+        # =====================================
+        # DAERAH BURUK
+        # =====================================
+
+        if bilangan <= parm['buruk_c']:
+
+            pembilang += bilangan * rest.buruk_akhir
+            penyebut += rest.buruk_akhir
+
+        # =====================================
+        # DAERAH BAGUS
+        # =====================================
+
+        elif bilangan >= parm['bagus_b']:
+
+            pembilang += bilangan * rest.bagus_akhir
+            penyebut += rest.bagus_akhir
+
+        # =====================================
+        # DAERAH TRANSISI
+        # =====================================
+
+        else:
+
+            nilai_asli_buruk = (
+                -(bilangan - parm['buruk_d']) /
+                (parm['buruk_d'] - parm['buruk_c'])
+            )
+
+            nilai_asli_bagus = (
+                (bilangan - parm['bagus_a']) /
+                (parm['bagus_b'] - parm['bagus_a'])
+            )
+
+            nilai_terkecil_buruk = min(
+                nilai_asli_buruk,
+                rest.buruk_akhir
+            )
+
+            nilai_terkecil_bagus = min(
+                nilai_asli_bagus,
+                rest.bagus_akhir
+            )
+
+            nilai_max = max(
+                nilai_terkecil_buruk,
+                nilai_terkecil_bagus
+            )
+
+            pembilang += bilangan * nilai_max
+            penyebut += nilai_max
+
+    # =====================================
+    # MENGHITUNG NILAI AKHIR
+    # =====================================
+
+    if penyebut != 0:
+
+        rest.nilai_akhir = pembilang // penyebut
+
+    else:
+
+        rest.nilai_akhir = 0
+
+    return rest
+
+
+# =====================================
+# MENJALANKAN DEFUZZIFIKASI
+# =====================================
+
+for i in range(len(restoran_data)):
+
+    restoran_data[i] = defuzzifikasi(
+        20,
+        restoran_data[i]
+    )
+
+
+# =====================================
+# SORTING NILAI AKHIR
+# =====================================
+
+def NilaiAkhirSort(restoran_temp):
+
+    restoran_temp = sorted(
+        restoran_temp,
+        key=lambda x: x.nilai_akhir,
+        reverse=True
+    )
+
+    return restoran_temp
+
+
+# =====================================
+# MENGURUTKAN DATA
+# =====================================
+
+restoran_data = NilaiAkhirSort(restoran_data)
+
+
+# =====================================
+# MENGAMBIL 10 RESTORAN TERBAIK
+# =====================================
+
+peringkat = []
+
+for i in range(10):
+
+    peringkat.append([
+        restoran_data[i].id_restoran
+    ])
+
+
+# =====================================
+# MEMBUAT DATAFRAME OUTPUT
+# =====================================
+
+df_akhir = pd.DataFrame(
+    peringkat,
+    columns=['id']
+)
+
+
+# =====================================
+# MENYIMPAN KE FILE EXCEL
+# =====================================
+
+df_akhir.to_excel(
+    'peringkat.xls',
+    index=False
+)
+
+
+# =====================================
+# MENAMPILKAN HASIL
+# =====================================
+
+print(df_akhir)
