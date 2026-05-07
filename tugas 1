@@ -1,0 +1,649 @@
+import pandas as pd                      # Mengimpor library pandas untuk mengolah data tabel
+import matplotlib.pyplot as plt         # Mengimpor matplotlib untuk membuat grafik/visualisasi
+
+df = pd.read_excel('restoran.xlsx')     # Membaca file Excel bernama 'restoran.xlsx'
+                                       # lalu menyimpannya ke dalam variabel df (DataFrame)
+
+df.head()                               # Menampilkan 5 baris pertama dari data
+                                       # untuk melihat isi awal DataFrame
+
+class restoran:                     # Membuat class bernama restoran
+
+    def __init__(self):             # Constructor, otomatis dijalankan saat objek dibuat
+
+        self.id_restoran = 0        # Menyimpan ID restoran
+        self.pelayanan = 0          # Menyimpan nilai pelayanan
+        self.makanan = 0            # Menyimpan nilai makanan
+
+        # Fuzzifikasi (Fuzzy Input)
+
+        self.makanan_enak = -1      # Derajat keanggotaan makanan enak
+                                    # Range nilai: [7 - 10]
+
+        self.makanan_tidakenak = -1 # Derajat keanggotaan makanan tidak enak
+                                    # Range nilai: [1 - 4]
+
+        self.pelayanan_baik = -1    # Derajat keanggotaan pelayanan baik
+                                    # Range nilai: [90 - 100]
+
+        self.pelayanan_biasa = -1   # Derajat keanggotaan pelayanan biasa
+                                    # Range nilai: [40 - 60]
+
+        self.pelayanan_jelek = -1   # Derajat keanggotaan pelayanan jelek
+                                    # Range nilai: [1 - 20]
+
+        # Inferensi (Fuzzy Output)
+
+        self.bagus = []             # Menyimpan semua kemungkinan hasil BAGUS
+
+        self.buruk = []             # Menyimpan semua kemungkinan hasil BURUK
+
+        self.bagus_akhir = 0        # Menyimpan nilai akhir BAGUS
+
+        self.buruk_akhir = 0        # Menyimpan nilai akhir BURUK
+
+        # Defuzzifikasi (Crisp Output)
+
+        self.nilai_akhir = 0        # Menyimpan hasil akhir fuzzy
+
+    def tampilData(self):           # Fungsi untuk menampilkan data restoran
+
+        print(
+            'id restoran: {} \n nilai pelayanan: {} \n nilai makanan: {} \n nilai akhir: {} \n   makanan_enak: {} \n   makanan_tidakenak: {} \n   pelayanan_baik: {} \n   pelayanan_biasa: {} \n   pelayanan_jelek: {} \n   persentase bagus: {} \n   persentase buruk: {}'.format(
+
+                self.id_restoran,   # Menampilkan ID restoran
+
+                self.pelayanan,     # Menampilkan nilai pelayanan
+
+                self.makanan,       # Menampilkan nilai makanan
+
+                self.nilai_akhir,   # Menampilkan nilai akhir fuzzy
+
+                self.makanan_enak,  # Menampilkan derajat makanan enak
+
+                self.makanan_tidakenak, # Menampilkan derajat makanan tidak enak
+
+                self.pelayanan_baik,    # Menampilkan derajat pelayanan baik
+
+                self.pelayanan_biasa,   # Menampilkan derajat pelayanan biasa
+
+                self.pelayanan_jelek,   # Menampilkan derajat pelayanan jelek
+
+                self.bagus_akhir,       # Menampilkan hasil akhir bagus
+
+                self.buruk_akhir        # Menampilkan hasil akhir buruk
+            )
+        )
+
+
+restoran_data = []                  # List untuk menyimpan semua objek restoran
+
+
+# Memasukkan data dari dataframe ke list restoran_data
+for i in range(len(df)):            # Perulangan sebanyak jumlah baris dataframe
+
+    restoran_temp = restoran()      # Membuat objek restoran sementara
+
+    restoran_temp.id_restoran = df.iloc[i][0]
+    # Mengambil data kolom pertama (ID restoran)
+
+    restoran_temp.pelayanan = df.iloc[i][1]
+    # Mengambil data kolom kedua (nilai pelayanan)
+
+    restoran_temp.makanan = df.iloc[i][2]
+    # Mengambil data kolom ketiga (nilai makanan)
+
+    restoran_data.append(restoran_temp)
+    # Menambahkan objek restoran ke dalam list restoran_data
+
+
+def GambarPelayanan():
+# Membuat fungsi untuk menggambar grafik fuzzy pelayanan
+
+    x1 = [0,20,40,100]
+    # Titik sumbu X untuk kategori Jelek
+
+    y1 = [1,1,0,0]
+    # Titik sumbu Y untuk kategori Jelek
+
+    x2 = [0,20,40,60,90,100]
+    # Titik sumbu X untuk kategori Biasa
+
+    y2 = [0,0,1,1,0,0]
+    # Titik sumbu Y untuk kategori Biasa
+
+    x3 = [0,60,90,100]
+    # Titik sumbu X untuk kategori Baik
+
+    y3 = [0,0,1,1]
+    # Titik sumbu Y untuk kategori Baik
+
+
+    plt.figure(figsize=(10,5))
+    # Membuat ukuran figure/grafik
+
+
+    plt.plot(x1, y1,'r-',label = 'Jelek')
+    # Membuat grafik garis merah kategori Jelek
+
+    plt.plot(x2, y2,'g-',label = 'Biasa')
+    # Membuat grafik garis hijau kategori Biasa
+
+    plt.plot(x3, y3,'b-',label = 'Baik')
+    # Membuat grafik garis biru kategori Baik
+
+
+    plt.xlabel('Nilai Pelayanan')
+    # Memberi label sumbu X
+
+    plt.ylabel('Nilai Keanggotaan')
+    # Memberi label sumbu Y
+
+    plt.title('Pelayanan (Dalam Rating)')
+    # Memberi judul grafik
+
+    plt.legend()
+    # Menampilkan legenda grafik
+
+
+    plt.savefig('fungsi_keanggotaan_pelayanan.jpg', format='jpg', dpi=300)
+    # Menyimpan grafik sebagai file JPG
+
+    plt.show()
+    # Menampilkan grafik ke layar
+
+
+
+def GambarMakanan():
+# Membuat fungsi untuk menggambar grafik fuzzy makanan
+
+    x1 = [0,4,7,10]
+    # Titik sumbu X untuk kategori Tidak Enak
+
+    y1 = [1,1,0,0]
+    # Titik sumbu Y untuk kategori Tidak Enak
+
+    x2 = [0,4,7,10]
+    # Titik sumbu X untuk kategori Enak
+
+    y2 = [0,0,1,1]
+    # Titik sumbu Y untuk kategori Enak
+
+
+    fig = plt.figure(figsize=(10,5))
+    # Membuat ukuran figure/grafik
+
+
+    plt.plot(x1, y1,'r-',label = 'Tidak Enak')
+    # Membuat grafik garis merah kategori Tidak Enak
+
+    plt.plot(x2, y2,'b-',label = 'Enak')
+    # Membuat grafik garis biru kategori Enak
+
+
+    plt.xlabel('Penilaian Makanan')
+    # Memberi label sumbu X
+
+    plt.ylabel('Nilai Keanggotaan')
+    # Memberi label sumbu Y
+
+    plt.title('Makanan (Dalam Rating)')
+    # Memberi judul grafik
+
+    plt.legend()
+    # Menampilkan legenda grafik
+
+
+    plt.savefig('fungsi_keanggotaan_makanan.jpg', format='jpg', dpi=300)
+    # Menyimpan grafik sebagai file JPG
+
+    plt.show()
+    # Menampilkan grafik ke layar
+
+
+GambarPelayanan()
+# Memanggil fungsi untuk menampilkan grafik pelayanan
+
+GambarMakanan()
+# Memanggil fungsi untuk menampilkan grafik makanan
+
+
+def fuzzifikasi(restoran_temp):
+# Membuat fungsi fuzzifikasi dengan parameter restoran_temp
+
+    for i in range (len(restoran_temp)):
+    # Perulangan sebanyak jumlah data restoran
+
+        # =====================================
+        # PERHITUNGAN FUZZY PELAYANAN
+        # =====================================
+
+        if restoran_temp[i].pelayanan >= 1 and restoran_temp[i].pelayanan <= 20:
+        # Jika nilai pelayanan antara 1 - 20
+
+            restoran_temp[i].pelayanan_jelek = 1
+            # Derajat keanggotaan pelayanan jelek = 1
+
+        elif restoran_temp[i].pelayanan > 20 and restoran_temp[i].pelayanan < 40:
+        # Jika nilai pelayanan berada di antara 20 - 40
+
+            restoran_temp[i].pelayanan_jelek = -(restoran_temp[i].pelayanan - 40)/(40 - 20)
+            # Menghitung derajat pelayanan jelek menggunakan rumus garis turun
+
+            restoran_temp[i].pelayanan_biasa = (restoran_temp[i].pelayanan - 20)/(40 - 20)
+            # Menghitung derajat pelayanan biasa menggunakan rumus garis naik
+
+        elif restoran_temp[i].pelayanan >= 40 and restoran_temp[i].pelayanan <= 60:
+        # Jika nilai pelayanan antara 40 - 60
+
+            restoran_temp[i].pelayanan_biasa = 1
+            # Derajat keanggotaan pelayanan biasa = 1
+
+        elif restoran_temp[i].pelayanan > 60 and restoran_temp[i].pelayanan < 90:
+        # Jika nilai pelayanan berada di antara 60 - 90
+
+            restoran_temp[i].pelayanan_biasa = -(restoran_temp[i].pelayanan - 90)/(90 - 60)
+            # Menghitung derajat pelayanan biasa menggunakan rumus garis turun
+
+            restoran_temp[i].pelayanan_baik = (restoran_temp[i].pelayanan - 60)/(90 - 60)
+            # Menghitung derajat pelayanan baik menggunakan rumus garis naik
+
+        elif restoran_temp[i].pelayanan >= 90 and restoran_temp[i].pelayanan <= 100:
+        # Jika nilai pelayanan antara 90 - 100
+
+            restoran_temp[i].pelayanan_baik = 1
+            # Derajat keanggotaan pelayanan baik = 1
+
+
+        # =====================================
+        # PERHITUNGAN FUZZY MAKANAN
+        # =====================================
+
+        if restoran_temp[i].makanan >= 1 and restoran_temp[i].makanan <= 4:
+        # Jika nilai makanan antara 1 - 4
+
+            restoran_temp[i].makanan_tidakenak = 1
+            # Derajat keanggotaan makanan tidak enak = 1
+
+        elif restoran_temp[i].makanan > 4 and restoran_temp[i].makanan < 7:
+        # Jika nilai makanan berada di antara 4 - 7
+
+            restoran_temp[i].makanan_tidakenak = -(restoran_temp[i].makanan - 7)/(7 - 4)
+            # Menghitung derajat makanan tidak enak dengan rumus garis turun
+
+            restoran_temp[i].makanan_enak = (restoran_temp[i].makanan - 4)/(7 - 4)
+            # Menghitung derajat makanan enak dengan rumus garis naik
+
+        elif restoran_temp[i].makanan >= 7 and restoran_temp[i].makanan <= 10:
+        # Jika nilai makanan antara 7 - 10
+
+            restoran_temp[i].makanan_enak = 1
+            # Derajat keanggotaan makanan enak = 1
+
+    return restoran_temp
+    # Mengembalikan data restoran yang sudah difuzzifikasi
+
+
+# Melakukan fuzzifikasi terhadap seluruh data restoran
+restoran_data = fuzzifikasi(restoran_data)
+# Memanggil fungsi fuzzifikasi dan menyimpan hasilnya ke restoran_data
+
+
+def inferensi(restoran_temp):
+# Membuat fungsi inferensi dengan parameter restoran_temp
+
+    for i in range  (len(restoran_temp)):
+    # Perulangan sebanyak jumlah data restoran
+
+      if restoran_temp[i].makanan_tidakenak != -1:
+      # Jika makanan memiliki nilai keanggotaan tidak enak
+
+          if restoran_temp[i].pelayanan_jelek != -1:
+          # Jika pelayanan memiliki nilai keanggotaan jelek
+
+              restoran_temp[i].buruk.append(
+                  min(
+                      restoran_temp[i].makanan_tidakenak,
+                      restoran_temp[i].pelayanan_jelek
+                  )
+              )
+              # Mengambil nilai minimum dari makanan tidak enak
+              # dan pelayanan jelek lalu dimasukkan ke list buruk
+
+          if restoran_temp[i].pelayanan_biasa != -1:
+          # Jika pelayanan memiliki nilai keanggotaan biasa
+
+              restoran_temp[i].buruk.append(
+                  min(
+                      restoran_temp[i].makanan_tidakenak,
+                      restoran_temp[i].pelayanan_biasa
+                  )
+              )
+              # Mengambil nilai minimum dari makanan tidak enak
+              # dan pelayanan biasa lalu dimasukkan ke list buruk
+
+          if restoran_temp[i].pelayanan_baik != -1:
+          # Jika pelayanan memiliki nilai keanggotaan baik
+
+              restoran_temp[i].buruk.append(
+                  min(
+                      restoran_temp[i].makanan_tidakenak,
+                      restoran_temp[i].pelayanan_baik
+                  )
+              )
+              # Mengambil nilai minimum dari makanan tidak enak
+              # dan pelayanan baik lalu dimasukkan ke list buruk
+
+
+      if restoran_temp[i].makanan_enak != -1:
+      # Jika makanan memiliki nilai keanggotaan enak
+
+          if restoran_temp[i].pelayanan_jelek != -1:
+          # Jika pelayanan memiliki nilai keanggotaan jelek
+
+              restoran_temp[i].buruk.append(
+                  min(
+                      restoran_temp[i].makanan_enak,
+                      restoran_temp[i].pelayanan_jelek
+                  )
+              )
+              # Mengambil nilai minimum dari makanan enak
+              # dan pelayanan jelek lalu dimasukkan ke list buruk
+
+          if restoran_temp[i].pelayanan_biasa != -1:
+          # Jika pelayanan memiliki nilai keanggotaan biasa
+
+              restoran_temp[i].bagus.append(
+                  min(
+                      restoran_temp[i].makanan_enak,
+                      restoran_temp[i].pelayanan_biasa
+                  )
+              )
+              # Mengambil nilai minimum dari makanan enak
+              # dan pelayanan biasa lalu dimasukkan ke list bagus
+
+          if restoran_temp[i].pelayanan_baik != -1:
+          # Jika pelayanan memiliki nilai keanggotaan baik
+
+              restoran_temp[i].bagus.append(
+                  min(
+                      restoran_temp[i].makanan_enak,
+                      restoran_temp[i].pelayanan_baik
+                  )
+              )
+              # Mengambil nilai minimum dari makanan enak
+              # dan pelayanan baik lalu dimasukkan ke list bagus
+
+
+      if len(restoran_temp[i].bagus) != 0:
+      # Jika list bagus tidak kosong
+
+          restoran_temp[i].bagus_akhir = max(restoran_temp[i].bagus)
+          # Mengambil nilai maksimum dari list bagus
+
+
+      if len(restoran_temp[i].buruk) != 0:
+      # Jika list buruk tidak kosong
+
+          restoran_temp[i].buruk_akhir = max(restoran_temp[i].buruk)
+          # Mengambil nilai maksimum dari list buruk
+
+
+    return restoran_temp
+    # Mengembalikan data restoran yang sudah melalui inferensi
+
+
+# Melakukan inferensi terhadap seluruh data restoran
+restoran_data = inferensi(restoran_data)
+# Memanggil fungsi inferensi dan menyimpan hasilnya ke restoran_data
+
+
+def GambarNilaiAkhir():
+# Membuat fungsi untuk menampilkan grafik nilai akhir fuzzy
+
+    x1 = [0,40,80,100]
+    # Titik sumbu X untuk kategori Buruk
+
+    y1 = [1,1,0,0]
+    # Titik sumbu Y untuk kategori Buruk
+
+    x2 = [0,40,80,100]
+    # Titik sumbu X untuk kategori Bagus
+
+    y2 = [0,0,1,1]
+    # Titik sumbu Y untuk kategori Bagus
+
+
+    plt.figure(figsize=(10,5))
+    # Membuat ukuran figure/grafik dengan lebar 10 dan tinggi 5
+
+
+    plt.plot(x1, y1,'r-',label = 'Buruk')
+    # Membuat grafik garis warna merah untuk kategori Buruk
+
+    plt.plot(x2, y2,'b-',label = 'Bagus')
+    # Membuat grafik garis warna biru untuk kategori Bagus
+
+
+    plt.xlabel('Penilaian Restoran')
+    # Memberi label pada sumbu X
+
+    plt.ylabel('Nilai Keanggotaan')
+    # Memberi label pada sumbu Y
+
+    plt.title('Rating Akhir')
+    # Memberi judul grafik
+
+    plt.legend()
+    # Menampilkan legenda grafik
+
+
+    plt.savefig('fungsi_keanggotaan_output.jpg', format='jpg', dpi=300)
+    # Menyimpan grafik ke file JPG dengan kualitas 300 dpi
+
+    plt.show()
+    # Menampilkan grafik ke layar
+
+
+GambarNilaiAkhir()
+# Memanggil fungsi GambarNilaiAkhir
+
+
+def defuzzifikasi(sample: int, rest: restoran) -> restoran:
+# Membuat fungsi defuzzifikasi
+# sample = jumlah titik sampling
+# rest = objek restoran
+
+    # =====================================
+    # PARAMETER FUNGSI KEANGGOTAAN OUTPUT
+    # =====================================
+
+    parm = {
+
+        "batas_bawah" : 1,
+        # Nilai minimum output
+
+        "buruk_c" : 40,
+        # Batas akhir daerah penuh BURUK
+
+        "buruk_d" : 80,
+        # Batas akhir transisi BURUK
+
+        "bagus_a" : 40,
+        # Awal transisi BAGUS
+
+        "bagus_b" : 80,
+        # Awal daerah penuh BAGUS
+
+        "batas_atas": 100
+        # Nilai maksimum output
+    }
+
+    pembilang = 0
+    # Variabel untuk menyimpan total pembilang rata-rata terbobot
+
+    penyebut = 0
+    # Variabel untuk menyimpan total penyebut rata-rata terbobot
+
+    increment = 100 // sample
+    # Menentukan jarak antar sampel
+
+    for i in (range(sample-0)):
+    # Perulangan sebanyak jumlah sample
+
+        bilangan = (i+1) * increment
+        # Membuat nilai sampling
+
+        # print(bilangan)
+        # Digunakan untuk debugging jika ingin melihat nilai sampling
+
+
+        if bilangan <= parm['buruk_c']:
+        # Jika nilai sampling berada di daerah BURUK penuh
+
+            pembilang += bilangan*rest.buruk_akhir
+            # Menambahkan hasil perkalian nilai sampling
+            # dengan derajat buruk akhir ke pembilang
+
+            penyebut += rest.buruk_akhir
+            # Menambahkan derajat buruk akhir ke penyebut
+
+
+        elif bilangan >= parm['bagus_b']:
+        # Jika nilai sampling berada di daerah BAGUS penuh
+
+            pembilang += bilangan*rest.bagus_akhir
+            # Menambahkan hasil perkalian nilai sampling
+            # dengan derajat bagus akhir ke pembilang
+
+            penyebut += rest.bagus_akhir
+            # Menambahkan derajat bagus akhir ke penyebut
+
+
+        else:
+        # Jika nilai sampling berada di daerah transisi
+
+            nilai_asli_buruk = -(bilangan - parm['buruk_d']) / (parm['buruk_d'] - parm['buruk_c'])
+            # Menghitung derajat keanggotaan asli BURUK
+
+            nilai_asli_bagus = (bilangan - parm['bagus_a']) / (parm['bagus_b'] - parm['bagus_a'])
+            # Menghitung derajat keanggotaan asli BAGUS
+
+
+            nilai_terkecil_buruk = min([nilai_asli_buruk, rest.buruk_akhir])
+            # Mengambil nilai minimum antara
+            # derajat asli buruk dan buruk akhir
+
+            nilai_terkecil_bagus = min([nilai_asli_bagus, rest.bagus_akhir])
+            # Mengambil nilai minimum antara
+            # derajat asli bagus dan bagus akhir
+
+
+            nilai_max = max([nilai_terkecil_buruk, nilai_terkecil_bagus])
+            # Mengambil nilai maksimum dari kedua hasil minimum
+
+
+            pembilang += bilangan*nilai_max
+            # Menambahkan hasil perkalian nilai sampling
+            # dengan nilai maksimum ke pembilang
+
+            penyebut += nilai_max
+            # Menambahkan nilai maksimum ke penyebut
+
+
+    rest.nilai_akhir = pembilang // penyebut
+    # Menghitung nilai akhir menggunakan metode rata-rata terbobot
+
+
+    return rest
+    # Mengembalikan objek restoran yang sudah didefuzzifikasi
+
+
+# =====================================
+# MELAKUKAN DEFUZZIFIKASI
+# =====================================
+
+for i in range(len(restoran_data)):
+# Perulangan sebanyak jumlah data restoran
+
+    restoran_data[i] = defuzzifikasi(20, restoran_data[i])
+    # Memanggil fungsi defuzzifikasi
+    # dengan 20 titik sample
+
+def NilaiAkhirSort(restoran_temp: [restoran()]):
+# Membuat fungsi untuk mengurutkan data restoran
+
+        restoran_temp = sorted(
+            restoran_temp,
+            key=lambda x: x.nilai_akhir,
+            reverse=1
+        )
+        # Mengurutkan list restoran berdasarkan nilai_akhir
+        # reverse=1 berarti urutan dari terbesar ke terkecil
+
+        return restoran_temp
+        # Mengembalikan list yang sudah diurutkan
+
+
+# =====================================
+# SORTING DATA RESTORAN
+# =====================================
+
+restoran_data = NilaiAkhirSort(restoran_data)
+# Memanggil fungsi sorting
+# lalu menyimpan hasilnya ke restoran_data
+
+
+# =====================================
+# MENGAMBIL 10 RESTORAN TERBAIK
+# =====================================
+
+data_akhir = []
+# Membuat list kosong untuk menyimpan data akhir
+
+for i in range(10):
+# Perulangan sebanyak 10 kali
+
+        data_temp = []
+        # Membuat list sementara
+
+        data_temp.append(restoran_data[i].id_restoran)
+        # Menambahkan ID restoran
+
+        data_temp.append(restoran_data[i].nilai_akhir)
+        # Menambahkan nilai akhir restoran
+
+        data_temp.append(restoran_data[i].pelayanan)
+        # Menambahkan nilai pelayanan restoran
+
+        data_temp.append(restoran_data[i].makanan)
+        # Menambahkan nilai makanan restoran
+
+        data_akhir.append(data_temp)
+        # Menambahkan data_temp ke list data_akhir
+
+
+# =====================================
+# MEMBUAT DATAFRAME HASIL AKHIR
+# =====================================
+
+df_akhir = pd.DataFrame(
+    data_akhir,
+    columns=['id', 'nilai_akhir', 'pelayanan', 'makanan']
+)
+# Mengubah list data_akhir menjadi dataframe
+# dengan nama kolom:
+# id, nilai_akhir, pelayanan, makanan
+
+
+# =====================================
+# MENYIMPAN DATAFRAME KE EXCEL
+# =====================================
+
+df_akhir.to_excel('peringkat.xlsx')
+# Menyimpan dataframe ke file Excel
+# dengan nama peringkat.xlsx
+
+
+df_akhir
+# Menampilkan dataframe hasil akhir
